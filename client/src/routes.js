@@ -12,6 +12,7 @@ export default function AppRoutes() {
                 <Route path="/" element={<Login/>}/>
                 <Route path="/book" element={<Books/>}/>
                 <Route path="/book/new" element={<NewBook/>}/>
+                <Route path="/book/new/:bookId" element={<NewBook/>}/>
             </Routes>
         </BrowserRouter>
     );
