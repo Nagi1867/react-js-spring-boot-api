@@ -16,23 +16,47 @@ export default function Books() {
     
     const navigate = useNavigate();
 
+    async function logout() {
+        localStorage.clear();
+        navigate('/')
+    }
+
+    async function deleteBook(id) {
+        try {
+            await api.delete(`api/book/v1/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                },
+            })
+
+            setBooks(books.filter(book => book.id !== id))
+        } catch(err) {
+            alert('Delete failed! Try again.')
+        }
+    }
+
     useEffect(() => {
         api.get('api/book/v1',  {
             headers: {
                 Authorization: `Bearer ${accessToken}`
+            },
+            params: {
+                page: 1,
+                limit: 4,
+                direction: 'asc'
             }
         }).then(response => {
             setBooks(response.data._embedded.bookVoes)
         })
-    })
+    }, [])
 
     return (
         <div className="book-container">
             <header>
                 <img src={logo} alt="Logo" />
-                <span>Welcome, <strong>{userName.toUpperCase()}</strong></span>
+                <span>Welcome, <strong>{userName ? userName.toUpperCase() : 'Guest'}</strong></span>
                 <Link className="button" to="new">Add New Book</Link>
-                <button type="button">
+                <button onClick={logout} type="button">
                     <FiPower size={18} color="#251fc5" />
                 </button>
             </header>
@@ -40,7 +64,7 @@ export default function Books() {
             <h1>Registered Books</h1>
             <ul>
                 {books.map(book => (
-                    <li>
+                    <li key={book.id}>
                         <strong>Title:</strong>
                         <p>{book.title}</p>
                         <strong>Author:</strong>
@@ -53,7 +77,7 @@ export default function Books() {
                         <button type="button">
                             <FiEdit size={20} color="#251fc5"/>
                         </button>
-                        <button type="button">
+                        <button onClick={() => deleteBook(book.id)} type="button">
                             <FiTrash2 size={20} color="#251fc5"/>
                         </button>
                     </li>
